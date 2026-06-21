@@ -557,9 +557,8 @@ function showError(id, show) {
   }
 }
 
-function submitForm() {
+async function submitForm() {
   let valid = true;
-
   const fields = ['fullname', 'whatsapp', 'property', 'unit', 'issue-type', 'description'];
   fields.forEach(f => {
     const el = document.getElementById(f);
@@ -578,6 +577,32 @@ function submitForm() {
   }
 
   if (!valid) return;
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  const data = {
+    fullname: document.getElementById('fullname').value,
+    whatsapp: document.getElementById('whatsapp').value,
+    property: document.getElementById('property').value,
+    unit: document.getElementById('unit').value,
+    issue_type: document.getElementById('issue-type').value,
+    urgency: urgency.value,
+    description: document.getElementById('description').value,
+    visit_time: document.getElementById('visit-time').value,
+    submitted_at: new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos' })
+  };
+
+  try {
+    await fetch('https://hook.eu1.make.com/o2p5fffjlp2cpfareynug5dv8djsa548', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+  } catch (e) {
+    console.log('Webhook error', e);
+  }
 
   const refNum = 'ENC-' + String(Math.floor(Math.random() * 9000) + 1000);
   document.getElementById('refBadge').textContent = 'REF #' + refNum;
